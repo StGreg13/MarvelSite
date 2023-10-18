@@ -6,6 +6,7 @@ import CharList from "../charList/CharList.jsx";
 import CharInfo from "../charInfo/CharInfo.jsx";
 
 import decoration from '../../assets/img/vision.png';
+import ErrorBoundary from "../errorBoundary/errorBoundary.jsx";
 
 
 class App extends Component {
@@ -23,10 +24,14 @@ class App extends Component {
       <div className="app">
         <AppHeader/>
         <main>
-          <RandomChar/>
+          <ErrorBoundary>
+            <RandomChar/>
+          </ErrorBoundary>
           <div className="char__content">
             <CharList onCharSelected={this.onCharSelected}/>
-            <CharInfo charId={this.state.selectedChar}/>
+            <ErrorBoundary>
+              <CharInfo charId={this.state.selectedChar}/>
+            </ErrorBoundary>
           </div>
           <img className="bg-decoration" src={decoration} alt="vision"/>
         </main>

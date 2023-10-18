@@ -5,26 +5,60 @@ import {Component} from "react";
 import MarvelServices from "../../services/MarvelServices.js";
 
 class CharList extends Component {
-
     state = {
         charList: [],
         loading: true,
-        error: false
+        newItemLoading: false,
+        error: false,
+        offset: 210,
+        charEnded: false,
     }
 
     marvelService = new MarvelServices();
 
     componentDidMount() {
-        this.marvelService.getAllCharacters()
-          .then(this.onCharListLoaded)
-          .catch(this.onError)
+        this.onRequest()
     }
 
-    onCharListLoaded = (charList) => {
+    onRequest = (offset) => {
+        if (this.state.newItemLoading) {
+            return; // Не выполнять запрос, если уже идет загрузка
+        }
+
+        this.onCharListLoading();
+        this.marvelService.getAllCharacters(offset)
+          .then(this.onCharListLoaded)
+          .catch(this.onError);
+    }
+
+    onCharListLoading = () => {
         this.setState({
-            charList,
-            loading: false
+            newItemLoading: true
         })
+    }
+
+    onCharListLoaded = (newCharList) => {
+        let ended = false
+        if (newCharList.length < 9) {
+            ended = true
+        }
+
+        this.setState(({ offset, charList }) => {
+            const mergedCharList = [...charList];
+            newCharList.forEach((newChar) => {
+                if (!mergedCharList.some((char) => char.id === newChar.id)) {
+                    mergedCharList.push(newChar);
+                }
+            });
+
+            return {
+                charList: mergedCharList,
+                loading: false,
+                newItemLoading: false,
+                offset: offset + 9,
+                charEnded: ended
+            };
+        });
     }
 
     onError = () => {
@@ -35,6 +69,7 @@ class CharList extends Component {
     }
 
     renderItems(arr) {
+        console.log(arr)
         const items =  arr.map((item) => {
             let imgStyle = {'objectFit' : 'cover'};
             if (item.thumbnail === 'http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available.jpg') {
@@ -60,25 +95,26 @@ class CharList extends Component {
     }
 
     render() {
-
-        const {charList, loading, error} = this.state;
-
-        const items = this.renderItems(charList);
-
+        const { charList, loading, error, newItemLoading, offset, charEnded } = this.state;
         const errorMessage = error ? <ErrorMessage/> : null;
         const spinner = loading ? <Spinner/> : null;
-        const content = !(loading || error) ? items : null;
+        const content = !(loading || error) ? this.renderItems(charList) : null;
 
         return (
           <div className="char__list">
               {errorMessage}
               {spinner}
               {content}
-              <button className="button button__main button__long">
+              <button
+                disabled={newItemLoading}
+                onClick={() => this.onRequest(offset)}
+                className="button button__main button__long"
+                style={{'display' : charEnded ? 'none': 'block'}}
+              >
                   <div className="inner">load more</div>
               </button>
           </div>
-        )
+        );
     }
 }
 
