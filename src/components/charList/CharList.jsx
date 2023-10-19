@@ -3,6 +3,7 @@ import ErrorMessage from "../errorMessage/errorMessage.jsx";
 import Spinner from "../spinner/Spinner.jsx";
 import {Component} from "react";
 import MarvelServices from "../../services/MarvelServices.js";
+import PropTypes from "prop-types";
 
 class CharList extends Component {
     state = {
@@ -69,7 +70,6 @@ class CharList extends Component {
     }
 
     renderItems(arr) {
-        console.log(arr)
         const items =  arr.map((item) => {
             let imgStyle = {'objectFit' : 'cover'};
             if (item.thumbnail === 'http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available.jpg') {
@@ -116,6 +116,9 @@ class CharList extends Component {
           </div>
         );
     }
+}
+CharList.propTypes = {
+    onCharSelected: PropTypes.func,
 }
 
 
