@@ -1,6 +1,12 @@
-import AppHeader from "../appHeader/AppHeader.jsx";
+import {lazy} from "react";
 import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
-import {ComicsPage, MainPage, Page404, SingleComicPage} from "../pages/index.js";
+
+import AppHeader from "../appHeader/AppHeader.jsx";
+
+const Page404 = lazy(() => import('../pages/404'));
+const MainPage = lazy(() => import('../pages/MainPage'));
+const ComicsPage = lazy(() => import('../pages/ComicsPage'));
+const SingleComicPage = lazy(() => import('../pages/SingleComicPage'));
 
 const App = () => {
   return (
